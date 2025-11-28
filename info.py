@@ -17,7 +17,7 @@ API_HASH = environ.get('API_HASH', 'b215f8e05089c399ed89170544621a70')
 BOT_TOKEN = environ.get('BOT_TOKEN', "8270600034:AAGXRhFQa2zAWxN88ANG2NX67N-xjns25aY")
 
 # Keep-Alive URL
-KEEP_ALIVE_URL = environ.get("KEEP_ALIVE_URL", "")  # <-- Add this line
+KEEP_ALIVE_URL = environ.get("KEEP_ALIVE_URL", "https://your-app-name.onrender.com")  # <-- Add this line
 
 # ============================================================
 # 🔹 START PICTURES
@@ -262,5 +262,6 @@ REACTIONS = [
 # Dont remove Credits
 # Developer Telegram @MyselfNeon
 # Update channel - @NeonFiles
+
 
 
