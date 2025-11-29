@@ -6,7 +6,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from pymongo import MongoClient
 from info import DATABASE_NAME  # your existing config
-from info import DATABASE_URL
+
 
 # -----------------------
 # CONFIG
