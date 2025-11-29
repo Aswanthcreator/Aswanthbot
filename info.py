@@ -98,7 +98,11 @@ DELETE_CHANNELS = [int(dch) if id_pattern.search(dch) else dch
 # ============================================================
 # 🔹 DATABASE
 # ============================================================
-DATABASE_URI = environ.get('DATABASE_URI', "mongodb+srv://ASMOVIE_DD:ASMOVIE_DDD@cluster0.1riyjj1.mongodb.net/?appName=Cluster0")
+DATABASE_URI = environ.get(
+    'DATABASE_URI',
+    "mongodb+srv://ASMOVIE_DD:ASMOVIE_DDD@cluster0.1riyjj1.mongodb.net/?appName=Cluster0"
+)
+
 DATABASE_NAME = environ.get('DATABASE_NAME', "NeonFilter")
 COLLECTION_NAME = environ.get('COLLECTION_NAME', 'neoncollection')
 
@@ -274,6 +278,7 @@ REACTIONS = [
 # Dont remove Credits
 # Developer Telegram @MyselfNeon
 # Update channel - @NeonFiles
+
 
 
 
