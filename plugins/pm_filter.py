@@ -1917,7 +1917,8 @@ async def cb_handler(client: Client, query: CallbackQuery):
     
     elif query.data == "help":
         buttons = [[
-             InlineKeyboardButton('⚙️ Aᴅᴍɪɴ Oɴʟʏ 🛐', callback_data='admin'),
+             InlineKeyboardButton('Sᴛɪᴄᴋᴇʀ-ID 🆔', callback_data='sticker'),
+             InlineKeyboardButton('Uʀʟ-Dʟ 🌐', callback_data='ytdl')
          ], [ 
              InlineKeyboardButton('Rᴇɴᴀᴍᴇ 📝', callback_data='r_txt'),   
              InlineKeyboardButton('Sᴛʀᴇᴀᴍ/DL 🎦', callback_data='s_txt') 
@@ -1925,17 +1926,16 @@ async def cb_handler(client: Client, query: CallbackQuery):
              InlineKeyboardButton('Fɪʟᴇ Sᴛᴏʀᴇ 🔐', callback_data='store_file'),   
              InlineKeyboardButton('Tᴇʟᴇɢʀᴀᴘʜ 🌇', callback_data='tele') 
          ], [ 
-             InlineKeyboardButton('Cᴏɴɴᴇᴄᴛɪᴏɴꜱ 👥', callback_data='coct'), 
-             InlineKeyboardButton('Fɪʟᴛᴇʀꜱ 🎭', callback_data='filters')
+             InlineKeyboardButton('Sᴏɴɢ 🎙️', callback_data='song'),
+             InlineKeyboardButton('Eᴀʀɴ Mᴏɴᴇʏ 💸', callback_data='shortlink_info')
          ], [
              InlineKeyboardButton('Jꜱᴏɴ 👀', callback_data='json'), 
              InlineKeyboardButton('Mᴏᴅs ✏️', callback_data='mods')
          ], [
-             InlineKeyboardButton('Sᴏɴɢ 🎙️', callback_data='song'),
-             InlineKeyboardButton('Eᴀʀɴ Mᴏɴᴇʏ 💸', callback_data='shortlink_info')
+             InlineKeyboardButton('Cᴏɴɴᴇᴄᴛɪᴏɴꜱ 👥', callback_data='coct'), 
+             InlineKeyboardButton('Fɪʟᴛᴇʀꜱ 🎭', callback_data='filters')
          ], [
-             InlineKeyboardButton('Sᴛɪᴄᴋᴇʀ-ID 🆔', callback_data='sticker'),
-             InlineKeyboardButton('Uʀʟ-Dʟ 🌐', callback_data='ytdl')
+             InlineKeyboardButton('⚙️ Aᴅᴍɪɴ Oɴʟʏ 🛐', callback_data='admin'),
          ], [             
              InlineKeyboardButton('🏠 Hᴏᴍᴇ 🏠', callback_data='start')
         ]]
@@ -3288,6 +3288,7 @@ async def global_filters(client, message, text=False):
 # Dont remove Credits
 # Developer Telegram @MyselfNeon
 # Update channel - @NeonFiles
+
 
 
 
