@@ -21,6 +21,15 @@ Hᴇʀᴇ Aʀᴇ Mʏ Usᴇғᴜʟ Fᴇᴀᴛᴜʀᴇs</i> 🤗</b></blockquote>"
 • DᴀᴛᴀBᴀsᴇ : <a href='https://www.mongodb.com/'>Mᴏɴɢᴏ DB</a> 
 • Bᴏᴛ Sᴇʀᴠᴇʀ : <a href='https://heroku.com'>Hᴇʀᴏᴋᴜ</a> 
 • Bᴜɪʟᴅ Sᴛᴀᴛᴜs : ᴠ𝟸.𝟽.𝟷 [Sᴛᴀʙʟᴇ]</i></b>"""
+    OWNER_TXT = """<b><blockquote>‣ 📝 𝐌𝐀𝐒𝐓𝐄𝐑 𝐌𝐈𝐍𝐃</blockquote>
+
+• Nᴀᴍᴇ :  <a href='https://t.me/Aswanthcreator'>Asᴡᴀɴᴛʜ</a> 
+• Uꜱᴇʀ Iᴅ :  <a href='https://t.me/Aswanthcreator'>8587405600</a> 
+• Uꜱᴇʀɴᴀᴍᴇ : <a href='https://t.me/Aswanthcreator'>@Asᴡᴀɴᴛʜᴄʀᴇᴀᴛᴏʀ</a> 
+
+⚙️ Dᴇᴠ : Pʀᴏ ꜰɪʟᴛᴇʀ ʙᴏᴛ ᴅᴇᴠᴇʟᴏᴘᴇʀ ⚡  
+🚀 Pᴏᴡᴇʀɪɴɢ ᴛᴏᴘ Aᴜᴛᴏ ꜰɪʟᴛᴇʀ ʙᴏᴛꜱ</b>
+"""
 
     CLONE_ABOUT_TXT = """<b><i><blockquote>‣ 📝 My Details</blockquote>
     
