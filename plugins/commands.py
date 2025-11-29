@@ -48,7 +48,7 @@ async def start(client, message):
             buttons = [[
                 InlineKeyboardButton('🍀 Aᴅᴅ Mᴇ Tᴏ Yᴏᴜʀ Gʀᴏᴜᴘ 🍀', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
             ],[
-                InlineKeyboardButton('👑 Mᴀsᴛᴇʀ Mɪɴᴅ', callback_data='owner'),
+                InlineKeyboardButton('👑 Mᴀsᴛᴇʀ Mɪɴᴅ', callback_data="owner"),
                 InlineKeyboardButton('🍿 Mᴏᴠɪᴇ Gʀᴏᴜᴘ', url=GRP_LNK)
             ],[
                 InlineKeyboardButton('🆘 Hᴇʟᴘ', callback_data='help'),
@@ -60,7 +60,7 @@ async def start(client, message):
             buttons = [[
                 InlineKeyboardButton('🍀 Aᴅᴅ Mᴇ Tᴏ Yᴏᴜʀ Gʀᴏᴜᴘ 🍀', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
             ],[
-                InlineKeyboardButton('👑 Mᴀsᴛᴇʀ Mɪɴᴅ', callback_data='owner'),
+                InlineKeyboardButton('👑 Mᴀsᴛᴇʀ Mɪɴᴅ', callback_data="owner"),
                 InlineKeyboardButton('🍿 Mᴏᴠɪᴇ Gʀᴏᴜᴘ', url=GRP_LNK)
             ],[
                 InlineKeyboardButton('🆘 Hᴇʟᴘ', callback_data='help'),
@@ -132,7 +132,7 @@ async def start(client, message):
             buttons = [[
                 InlineKeyboardButton('🍀 Aᴅᴅ Mᴇ Tᴏ Yᴏᴜʀ Gʀᴏᴜᴘ 🍀', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
             ],[
-                InlineKeyboardButton('👑 Mᴀsᴛᴇʀ Mɪɴᴅ', callback_data='owner'),
+                InlineKeyboardButton('👑 Mᴀsᴛᴇʀ Mɪɴᴅ', callback_data="owner"),
                 InlineKeyboardButton('🍿 Mᴏᴠɪᴇ Gʀᴏᴜᴘ', url=GRP_LNK)
             ],[
                 InlineKeyboardButton('🆘 Hᴇʟᴘ', callback_data='help'),
@@ -144,7 +144,7 @@ async def start(client, message):
             buttons = [[
                 InlineKeyboardButton('🍀 Aᴅᴅ Mᴇ Tᴏ Yᴏᴜʀ Gʀᴏᴜᴘ 🍀', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
             ],[
-                InlineKeyboardButton('👑 Mᴀsᴛᴇʀ Mɪɴᴅ', callback_data='owner'),
+                InlineKeyboardButton('👑 Mᴀsᴛᴇʀ Mɪɴᴅ', callback_data="owner"),
                 InlineKeyboardButton('🍿 Mᴏᴠɪᴇ Gʀᴏᴜᴘ', url=GRP_LNK)
             ],[
                 InlineKeyboardButton('🆘 Hᴇʟᴘ', callback_data='help'),
@@ -185,7 +185,7 @@ async def start(client, message):
                 buttons = [[
                     InlineKeyboardButton('🍀 Aᴅᴅ Mᴇ Tᴏ Yᴏᴜʀ Gʀᴏᴜᴘ 🍀', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
                 ],[
-                    InlineKeyboardButton('👑 Mᴀsᴛᴇʀ Mɪɴᴅ', callback_data='owner'),
+                    InlineKeyboardButton('👑 Mᴀsᴛᴇʀ Mɪɴᴅ', callback_data="owner"),
                     InlineKeyboardButton('🍿 Mᴏᴠɪᴇ Gʀᴏᴜᴘ', url=GRP_LNK)
                 ],[
                     InlineKeyboardButton('🆘 Hᴇʟᴘ', callback_data='help'),
@@ -197,7 +197,7 @@ async def start(client, message):
                 buttons = [[
                     InlineKeyboardButton('🍀 Aᴅᴅ Mᴇ Tᴏ Yᴏᴜʀ Gʀᴏᴜᴘ 🍀', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
                 ],[
-                    InlineKeyboardButton('👑 Mᴀsᴛᴇʀ Mɪɴᴅ', callback_data='owner'),
+                    InlineKeyboardButton('👑 Mᴀsᴛᴇʀ Mɪɴᴅ', callback_data="owner"),
                     InlineKeyboardButton('🍿 Mᴏᴠɪᴇ Gʀᴏᴜᴘ', url=GRP_LNK)
                 ],[
                     InlineKeyboardButton('🆘 Hᴇʟᴘ', callback_data='help'),
@@ -1400,5 +1400,6 @@ async def purge_requests(client, message):
 # Dont remove Credits
 # Developer Telegram @MyselfNeon
 # Update channel - @NeonFiles
+
 
 
