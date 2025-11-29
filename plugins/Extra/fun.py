@@ -5,8 +5,7 @@ import os
 from pyrogram import Client, filters
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from pymongo import MongoClient
-from info import DATABASE_NAME  # your existing config
-
+from info import DATABASE_URI, DATABASE_NAME  # import full DB config
 
 # -----------------------
 # CONFIG
@@ -18,10 +17,6 @@ START_BALANCE_ADMIN = 50000
 # -----------------------
 # MONGODB SETUP
 # -----------------------
-DATABASE_URI = os.environ.get("DATABASE_URI")
-if not DATABASE_URI:
-    raise ValueError("DATABASE_URI environment variable is not set!")
-
 mongo_client = MongoClient(DATABASE_URI)
 db = mongo_client[DATABASE_NAME]
 balances_col = db["balances"]
