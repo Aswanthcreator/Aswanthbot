@@ -1825,13 +1825,11 @@ async def cb_handler(client: Client, query: CallbackQuery):
             buttons = [[
                 InlineKeyboardButton('🍀 Aᴅᴅ Mᴇ Tᴏ Yᴏᴜʀ Gʀᴏᴜᴘ 🍀', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
             ],[
-                InlineKeyboardButton('💰 Eᴀʀɴ Mᴏɴᴇʏ', callback_data="shortlink_info"),
+                InlineKeyboardButton('👑 Mᴀsᴛᴇʀ Mɪɴᴅ', callback_data='owner'),
                 InlineKeyboardButton('🍿 Mᴏᴠɪᴇ Gʀᴏᴜᴘ', url=GRP_LNK)
             ],[
                 InlineKeyboardButton('🆘 Hᴇʟᴘ', callback_data='help'),
                 InlineKeyboardButton('😎 Aʙᴏᴜᴛ', callback_data='about')
-            ],[
-                InlineKeyboardButton('Pʀᴇᴍɪᴜᴍ Aɴᴅ Rᴇғᴇʀʀᴀʟ', callback_data='subscription')
             ],[
                 InlineKeyboardButton('🌸 Jᴏɪɴ Uᴘᴅᴀᴛᴇ Cʜᴀɴɴᴇʟ 🌸', url=CHNL_LNK)
             ]]
@@ -1839,7 +1837,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             buttons = [[
                 InlineKeyboardButton('🍀 Aᴅᴅ Mᴇ Tᴏ Yᴏᴜʀ Gʀᴏᴜᴘ 🍀', url=f'http://t.me/{temp.U_NAME}?startgroup=true')
             ],[
-                InlineKeyboardButton('💰 Eᴀʀɴ Mᴏɴᴇʏ', callback_data="shortlink_info"),
+                InlineKeyboardButton('👑 Mᴀsᴛᴇʀ Mɪɴᴅ', callback_data='owner'),
                 InlineKeyboardButton('🍿 Mᴏᴠɪᴇ Gʀᴏᴜᴘ', url=GRP_LNK)
             ],[
                 InlineKeyboardButton('🆘 Hᴇʟᴘ', callback_data='help'),
@@ -1917,11 +1915,10 @@ async def cb_handler(client: Client, query: CallbackQuery):
     
     elif query.data == "help":
         buttons = [[
-             InlineKeyboardButton('Sᴛɪᴄᴋᴇʀ-ID 🆔', callback_data='sticker'),
-             InlineKeyboardButton('Uʀʟ-Dʟ 🌐', callback_data='ytdl')
+             InlineKeyboardButton('⚙️ Aᴅᴍɪɴ Oɴʟʏ 🛐', callback_data='admin'),
          ], [ 
-             InlineKeyboardButton('Rᴇɴᴀᴍᴇ 📝', callback_data='r_txt'),   
-             InlineKeyboardButton('Sᴛʀᴇᴀᴍ/DL 🎦', callback_data='s_txt') 
+             InlineKeyboardButton('Cᴏɴɴᴇᴄᴛɪᴏɴꜱ 👥', callback_data='coct'), 
+             InlineKeyboardButton('Fɪʟᴛᴇʀꜱ 🎭', callback_data='filters')
          ], [ 
              InlineKeyboardButton('Fɪʟᴇ Sᴛᴏʀᴇ 🔐', callback_data='store_file'),   
              InlineKeyboardButton('Tᴇʟᴇɢʀᴀᴘʜ 🌇', callback_data='tele') 
@@ -1932,10 +1929,11 @@ async def cb_handler(client: Client, query: CallbackQuery):
              InlineKeyboardButton('Jꜱᴏɴ 👀', callback_data='json'), 
              InlineKeyboardButton('Mᴏᴅs ✏️', callback_data='mods')
          ], [
-             InlineKeyboardButton('Cᴏɴɴᴇᴄᴛɪᴏɴꜱ 👥', callback_data='coct'), 
-             InlineKeyboardButton('Fɪʟᴛᴇʀꜱ 🎭', callback_data='filters')
+             InlineKeyboardButton('Rᴇɴᴀᴍᴇ 📝', callback_data='r_txt'),   
+             InlineKeyboardButton('Sᴛʀᴇᴀᴍ/DL 🎦', callback_data='s_txt') 
          ], [
-             InlineKeyboardButton('⚙️ Aᴅᴍɪɴ Oɴʟʏ 🛐', callback_data='admin'),
+             InlineKeyboardButton('Sᴛɪᴄᴋᴇʀ-ID 🆔', callback_data='sticker'),
+             InlineKeyboardButton('Uʀʟ-Dʟ 🌐', callback_data='ytdl')
          ], [             
              InlineKeyboardButton('🏠 Hᴏᴍᴇ 🏠', callback_data='start')
         ]]
@@ -3288,6 +3286,7 @@ async def global_filters(client, message, text=False):
 # Dont remove Credits
 # Developer Telegram @MyselfNeon
 # Update channel - @NeonFiles
+
 
 
 
