@@ -14,7 +14,7 @@ id_pattern = re.compile(r'^.\d+$')
 SESSION = environ.get('SESSION', 'MyselfNeon')
 API_ID = int(environ.get('API_ID', '20447284'))
 API_HASH = environ.get('API_HASH', 'b215f8e05089c399ed89170544621a70')
-BOT_TOKEN = environ.get('BOT_TOKEN', "8270600034:AAGXRhFQa2zAWxN88ANG2NX67N-xjns25aY")
+BOT_TOKEN = environ.get('BOT_TOKEN', "7996680610:AAG8leAamsgJilKuninAhe8WSRqLF62p2UM")
 
 # Keep-Alive URL
 KEEP_ALIVE_URL = environ.get("KEEP_ALIVE_URL", "https://your-app-name.onrender.com")  # <-- Add this line
@@ -26,12 +26,24 @@ KEEP_ALIVE_URL = environ.get("KEEP_ALIVE_URL", "https://your-app-name.onrender.c
 PICS = (
     environ.get(
         'PICS',
-        'https://files.catbox.moe/ybg6gw.jpg '
-        'https://files.catbox.moe/b5a3dz.jpg '
-        'https://files.catbox.moe/n0xw7h.jpg '
-        'https://files.catbox.moe/fhexii.jpg '
-        'https://files.catbox.moe/v7w8co.jpg '
-        'https://files.catbox.moe/r946bu.jpg'
+        'https://graph.org/file/856dedf2392bcc1f951ae-e69106494a12b6fd64.jpg'
+        'https://graph.org/file/896e7de09b9b82a462b5d-57ada1a4e3c0e78edb.jpg'
+        'https://graph.org/file/1b7d6ae759fe855473976-d92758327173dfce8c.jpg'
+        'https://graph.org/file/eeaa288b0427c3a6823b9-7bbd05058b3d8cdf5d.jpg'
+        'https://graph.org/file/4c95d72f9444c38f52bad-6a184f9fe5bc25a801.jpg'
+        'https://graph.org/file/ab6a797daf50e79d95f2c-5e82a5874dddafa1d9.jpg'
+        'https://graph.org/file/4112e27f4274c9e854084-6f2d50a7d477e5c949.jpg'
+        'https://graph.org/file/5be655c4840f56462ead6-830918119cd9e9ce8b.jpg'
+        'https://graph.org/file/ba697d84d93bd8b3fa53c-b55579f4b148d0aad3.jpg'
+        'https://graph.org/file/adcffaa2028eb96c541ff-cc15dbdef2fcb4e41f.jpg'
+        'https://graph.org/file/bea1103d928d2c49483af-4198216e69b4b22bdb.jpg'
+        'https://graph.org/file/0ccacd8754076d74cd7d6-944bf809ce3b45f8be.jpg'
+        'https://graph.org/file/859acb2a7be4604b9d586-a1fbaa80ac5eaa3dcb.jpg'
+
+
+
+
+        
     )
 ).split()
 
@@ -39,7 +51,7 @@ PICS = (
 # 🔹 ADMINS & USERS
 # ============================================================
 ADMINS = [int(admin) if id_pattern.search(admin) else admin
-          for admin in environ.get('ADMINS', '8452579484').split()]  # Multiple IDs separated by space
+          for admin in environ.get('ADMINS', '8587405600').split()]  # Multiple IDs separated by space
 
 auth_users = [int(user) if id_pattern.search(user) else user
               for user in environ.get('AUTH_USERS', '').split()]  # Multiple IDs separated by space
@@ -50,11 +62,11 @@ AUTH_USERS = (auth_users + ADMINS) if auth_users else []
 # ============================================================
 # 🔹 CHANNELS AND GROUPS
 # ============================================================
-LOG_CHANNEL = int(environ.get('LOG_CHANNEL', '-1003431017830'))
+LOG_CHANNEL = int(environ.get('LOG_CHANNEL', '-1003359134437'))
 # This Channel Is For When User Start Your Bot Then Bot Send That User Name And Id In This Log Channel, Same For Group Also.
 
 CHANNELS = [int(ch) if id_pattern.search(ch) else ch
-            for ch in environ.get('CHANNELS', '-1002658908912 -1003167820589').split()]
+            for ch in environ.get('CHANNELS', '-1002658908912 -1003370992067 -1003167820589').split()]
 # This Is File Channel Where You Upload Your File Then Bot Automatically Save It In Database
 
 REQUEST_TO_JOIN_MODE = bool(environ.get('REQUEST_TO_JOIN_MODE', False))  # True → request to join FSUB
@@ -65,18 +77,18 @@ auth_channel = environ.get('AUTH_CHANNEL', '-1001681286512')
 AUTH_CHANNEL = int(auth_channel) if auth_channel and id_pattern.search(auth_channel) else None
 
 # File request channel
-reqst_channel = environ.get('REQST_CHANNEL', '-1003431017830')
+reqst_channel = environ.get('REQST_CHANNEL', '-1003359134437')
 REQST_CHANNEL = int(reqst_channel) if reqst_channel and id_pattern.search(reqst_channel) else None
 
 # Index request channel
 INDEX_REQ_CHANNEL = int(environ.get('INDEX_REQ_CHANNEL', LOG_CHANNEL))
 
 # Bot support group
-support_chat_id = environ.get('SUPPORT_CHAT_ID', '')
+support_chat_id = environ.get('SUPPORT_CHAT_ID', '-1003254934811')
 SUPPORT_CHAT_ID = int(support_chat_id) if support_chat_id and id_pattern.search(support_chat_id) else None
 
 # File store channel (/batch command)
-FILE_STORE_CHANNEL = [int(ch) for ch in (environ.get('FILE_STORE_CHANNEL', '-1002658908912')).split()]
+FILE_STORE_CHANNEL = [int(ch) for ch in (environ.get('FILE_STORE_CHANNEL', '-1003359134437')).split()]
 
 # Delete channel(s)
 DELETE_CHANNELS = [int(dch) if id_pattern.search(dch) else dch
@@ -134,7 +146,7 @@ PAYMENT_TEXT = environ.get(
 # 🔹 CLONE SETTINGS
 # ============================================================
 # Clone Information : If Clone Mode Is True Then Bot Clone Other Bots.
-CLONE_MODE = bool(environ.get('CLONE_MODE', True)) # Set True or False
+CLONE_MODE = bool(environ.get('CLONE_MODE', False)) # Set True or False
 CLONE_DATABASE_URI = environ.get('CLONE_DATABASE_URI', "") # Necessary If clone mode is true
 PUBLIC_FILE_CHANNEL = environ.get('PUBLIC_FILE_CHANNEL', 'AnimeZerox') # Public Channel Username Without @ or without https://t.me/ and Bot Is Admin With Full Right.
 
@@ -262,6 +274,7 @@ REACTIONS = [
 # Dont remove Credits
 # Developer Telegram @MyselfNeon
 # Update channel - @NeonFiles
+
 
 
 
