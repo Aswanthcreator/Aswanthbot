@@ -13,9 +13,9 @@ You can create you own Clone Bot and use it in your own channel. It will Filter 
 Hᴇʀᴇ Aʀᴇ Mʏ Usᴇғᴜʟ Fᴇᴀᴛᴜʀᴇs</i> 🤗</b></blockquote>"""
 
     ABOUT_TXT = """<b><blockquote>‣ 📝 𝐌𝐘 𝐃𝐄𝐓𝐀𝐈𝐋𝐒</blockquote>    
-<i>• Mʏ Nᴀᴍᴇ : <a href=https://t.me/{}>{}</a>
+<i>• Mʏ Nᴀᴍᴇ : <a href=https://t.me/Aswanthcreator>{}</a>
 • Mʏ Bᴇsᴛ Fʀɪᴇɴᴅ : <a href='tg://settings'>Tʜɪs Sᴡᴇᴇᴛɪᴇ ❤️</a> 
-• Dᴇᴠᴇʟᴏᴘᴇʀ : <a href={}>@Asᴡᴀɴᴛʜᴄʀᴇᴀᴛᴏʀ</a> 
+• Dᴇᴠᴇʟᴏᴘᴇʀ : <a href='https://t.me/Aswanthcreator'>@Asᴡᴀɴᴛʜᴄʀᴇᴀᴛᴏʀ</a> 
 • Lɪʙʀᴀʀʏ : <a href='https://docs.pyrogram.org/'>Pʏʀᴏɢʀᴀᴍ</a> 
 • Lᴀɴɢᴜᴀɢᴇ : <a href='https://www.python.org/download/releases/3.0/'>Pʏᴛʜᴏɴ 𝟹</a> 
 • DᴀᴛᴀBᴀsᴇ : <a href='https://www.mongodb.com/'>Mᴏɴɢᴏ DB</a> 
