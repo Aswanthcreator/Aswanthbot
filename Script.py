@@ -231,7 +231,12 @@ If you do not see the Requested Movie/Series file, look at the next page...</i><
 
 𝗠𝗲𝘀𝘀𝗮𝗴𝗲 <b>: {}</b>"""
 
-    CAPTION = """"""
+    CAPTION = """<blockquote><b>📁 Fɪʟᴇ Nᴀᴍᴇ: 📄 <code>{file_name}</code>
+
+💾 Fɪʟᴇ Sɪᴢᴇ:  📦<code>{file_size}</code>
+
+
+🔗 [⚡ Jᴏɪɴ ᴄɪɴᴇᴍᴀ ʟᴏᴋᴀᴍ ⚡](https://t.me/Cinema_Lokam_Movie_Request)</b></blockquote>"""
 
     IMDB_TEMPLATE_TXT = """
 <b><i>Query: {query}
