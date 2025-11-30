@@ -17,33 +17,31 @@ API_HASH = environ.get('API_HASH', 'b215f8e05089c399ed89170544621a70')
 BOT_TOKEN = environ.get('BOT_TOKEN', "7996680610:AAG8leAamsgJilKuninAhe8WSRqLF62p2UM")
 
 # Keep-Alive URL
-KEEP_ALIVE_URL = environ.get("KEEP_ALIVE_URL", "https://aswanthbot.onrender.com")  # <-- Add this line
+KEEP_ALIVE_URL = environ.get(
+    "KEEP_ALIVE_URL",
+    "https://aswanthbot.onrender.com"
+)
 
 # ============================================================
 # 🔹 START PICTURES
 # ============================================================
-# (Add Multiple By Giving One Space Between Each)
+
 PICS = (
     environ.get(
         'PICS',
-        'https://graph.org/file/856dedf2392bcc1f951ae-e69106494a12b6fd64.jpg'
-        'https://graph.org/file/896e7de09b9b82a462b5d-57ada1a4e3c0e78edb.jpg'
-        'https://graph.org/file/1b7d6ae759fe855473976-d92758327173dfce8c.jpg'
-        'https://graph.org/file/eeaa288b0427c3a6823b9-7bbd05058b3d8cdf5d.jpg'
-        'https://graph.org/file/4c95d72f9444c38f52bad-6a184f9fe5bc25a801.jpg'
-        'https://graph.org/file/ab6a797daf50e79d95f2c-5e82a5874dddafa1d9.jpg'
-        'https://graph.org/file/4112e27f4274c9e854084-6f2d50a7d477e5c949.jpg'
-        'https://graph.org/file/5be655c4840f56462ead6-830918119cd9e9ce8b.jpg'
-        'https://graph.org/file/ba697d84d93bd8b3fa53c-b55579f4b148d0aad3.jpg'
-        'https://graph.org/file/adcffaa2028eb96c541ff-cc15dbdef2fcb4e41f.jpg'
-        'https://graph.org/file/bea1103d928d2c49483af-4198216e69b4b22bdb.jpg'
-        'https://graph.org/file/0ccacd8754076d74cd7d6-944bf809ce3b45f8be.jpg'
+        'https://graph.org/file/856dedf2392bcc1f951ae-e69106494a12b6fd64.jpg '
+        'https://graph.org/file/896e7de09b9b82a462b5d-57ada1a4e3c0e78edb.jpg '
+        'https://graph.org/file/1b7d6ae759fe855473976-d92758327173dfce8c.jpg '
+        'https://graph.org/file/eeaa288b0427c3a6823b9-7bbd05058b3d8cdf5d.jpg '
+        'https://graph.org/file/4c95d72f9444c38f52bad-6a184f9fe5bc25a801.jpg '
+        'https://graph.org/file/ab6a797daf50e79d95f2c-5e82a5874dddafa1d9.jpg '
+        'https://graph.org/file/4112e27f4274c9e854084-6f2d50a7d477e5c949.jpg '
+        'https://graph.org/file/5be655c4840f56462ead6-830918119cd9e9ce8b.jpg '
+        'https://graph.org/file/ba697d84d93bd8b3fa53c-b55579f4b148d0aad3.jpg '
+        'https://graph.org/file/adcffaa2028eb96c541ff-cc15dbdef2fcb4e41f.jpg '
+        'https://graph.org/file/bea1103d928d2c49483af-4198216e69b4b22bdb.jpg '
+        'https://graph.org/file/0ccacd8754076d74cd7d6-944bf809ce3b45f8be.jpg '
         'https://graph.org/file/859acb2a7be4604b9d586-a1fbaa80ac5eaa3dcb.jpg'
-
-
-
-
-        
     )
 ).split()
 
@@ -278,6 +276,7 @@ REACTIONS = [
 # Dont remove Credits
 # Developer Telegram @MyselfNeon
 # Update channel - @NeonFiles
+
 
 
 
