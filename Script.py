@@ -81,7 +81,7 @@ Buy paid plan by - /plan
 2. This Bot supports buttons with any telegram media type
 3. Buttons should be properly parsed as Markdown format</i></b>
 <blockquote><b><i>‣ URL Buttons</i></b></blockquote>
-<b><i>[Button Text](buttonurl:https://t.me/NeonFiles)</i></b>
+<b><i>[Button Text](buttonurl:https://t.me/Cinema_Updates_OTT)</i></b>
 <blockquote><b><i>‣ Alert Buttons</i></b></blockquote>
 <b><i>[Button Text](buttonalert:This is an Alert Message)</i></b>"""
 
@@ -109,8 +109,8 @@ Buy paid plan by - /plan
 • /connections - List of all connections</i></b>"""
 
     EXTRAMOD_TXT = """<blockquote><i><b>‣ Extra Modules</b></i></blockquote>
-<blockquote><b><i>Maintained by <a href={}>NeonAnurag 💖</a></i></b> 
-<b><i>Powered By @NeonFiles</i> 🔥</b></blockquote>
+<blockquote><b><i>Maintained by <a href={}>Aswanth 💖</a></i></b> 
+<b><i>Powered By <a href=https://t.me/Cinema_Lokam_Movies_Group>Cinema Lokam</a></i> 🔥</b></blockquote>
   
 <i>/id - <b>Get ID of specified User</b> 
 /info  - <b>Get information about a user</b>
