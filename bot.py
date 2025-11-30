@@ -1,17 +1,16 @@
-import sys, glob, importlib, logging, logging.config, pytz, asyncio
+import sys, importlib, logging, logging.config, pytz, asyncio
 from pathlib import Path
 
-# Get logging configurations
+# ---------------- Logging ----------------
 logging.config.fileConfig('logging.conf')
 logging.getLogger().setLevel(logging.INFO)
 logging.getLogger("pyrogram").setLevel(logging.ERROR)
 logging.getLogger("cinemagoer").setLevel(logging.ERROR)
 
-from pyrogram import Client, idle
+from pyrogram import idle
 from database.users_chats_db import db
 from info import *
 from utils import temp
-from typing import Union, Optional, AsyncGenerator
 from Script import script
 from datetime import date, datetime
 from aiohttp import web
@@ -22,69 +21,73 @@ from Neon.bot import NeonBot
 from Neon.util.keepalive import ping_server
 from Neon.bot.clients import initialize_clients
 
-# ------------------- Added Keep-Alive Function -------------------
-from info import KEEP_ALIVE_URL
+# ---------------- Keep Alive ----------------
 import aiohttp
-
 async def keep_alive():
-    """Send a request every 100 seconds to keep the bot alive (if required)."""
     async with aiohttp.ClientSession() as session:
         while True:
             try:
                 await session.get(KEEP_ALIVE_URL)
                 logging.info("Sent keep-alive request.")
             except Exception as e:
-                logging.error(f"Keep-alive request failed: {e}")
+                logging.error("Keep-alive failed: %s", e)
             await asyncio.sleep(100)
-# ----------------------------------------------------------------
+# -------------------------------------------------------
 
 
-# ------------------- Updated plugin loader -------------------
+# ---------------- Plugin Loader ----------------
 def get_all_plugin_files(root="plugins"):
-    """Recursively get all .py files in the plugins folder and subfolders."""
     files = []
     for path in Path(root).rglob("*.py"):
-        if path.name != "__init__.py":  # skip __init__.py
+        if path.name != "__init__.py":
             files.append(path)
     return files
 
 files = get_all_plugin_files()
-# -------------------------------------------------------------
+# -------------------------------------------------------
 
-NeonBot.start()
 loop = asyncio.get_event_loop()
 
 
+# ============================================================
+#                     BOT START FUNCTION
+# ============================================================
 async def start():
     print("\nInitializing Your Bot...\n")
 
-    bot_info = await NeonBot.get_me()
+    # ⭐ CORRECT BOT START (FIXES YOUR RESTART MESSAGE ISSUE)
+    await NeonBot.start()
+
+    # Load clients
     await initialize_clients()
 
-    # ------------------- Import plugins -------------------
+    # ------------------- Import Plugins -------------------
     for plugin_path in files:
         plugin_name = plugin_path.stem
         import_path = ".".join(plugin_path.with_suffix("").parts)
+
         spec = importlib.util.spec_from_file_location(import_path, plugin_path)
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
+
         sys.modules[import_path] = mod
         print(f"✨ Neon Imported => {plugin_name}")
     # -------------------------------------------------------
 
+    # Heroku keepalive
     if ON_HEROKU:
         asyncio.create_task(ping_server())
 
-    # Start keep-alive task
+    # User keep-alive
     if KEEP_ALIVE_URL:
         asyncio.create_task(keep_alive())
 
-    # ---------------- Load banned users/chats ----------------
+    # Load banned list
     b_users, b_chats = await db.get_banned()
     temp.BANNED_USERS = b_users
     temp.BANNED_CHATS = b_chats
 
-    # ---------------- Bot Info ----------------
+    # Bot info
     me = await NeonBot.get_me()
     temp.BOT = NeonBot
     temp.ME = me.id
@@ -93,44 +96,42 @@ async def start():
 
     logging.info(script.LOGO)
 
-    # ---------------- Timezone ----------------
+    # Time
     tz = pytz.timezone("Asia/Kolkata")
     today = date.today()
     now = datetime.now(tz)
     time = now.strftime("%I:%M:%S %p")
 
-    # ---------------- Restart Message ----------------
-    bot_name = me.first_name
+    # Restart message
     try:
         await NeonBot.send_message(
             chat_id=LOG_CHANNEL,
-            text=script.RESTART_TXT.format(bot_name, today, time),
+            text=script.RESTART_TXT.format(me.first_name, today, time),
         )
     except Exception as e:
         print("Restart message failed:", e)
 
-    # -------------------------------------------------
-    # Notify Channels
+    # Notify channels
     for ch in CHANNELS:
         try:
-            k = await NeonBot.send_message(chat_id=ch, text="**Bot Restarted**")
-            await k.delete()
+            msg = await NeonBot.send_message(ch, "**Bot Restarted**")
+            await msg.delete()
         except:
-            print("Make Your Bot Admin In File Channels With Full Rights")
+            print("Bot needs admin rights in File Channel:", ch)
 
     try:
-        k = await NeonBot.send_message(chat_id=AUTH_CHANNEL, text="**Bot Restarted**")
-        await k.delete()
+        msg = await NeonBot.send_message(AUTH_CHANNEL, "**Bot Restarted**")
+        await msg.delete()
     except:
-        print("Make Your Bot Admin In Force Subscribe Channel With Full Rights")
+        print("Bot needs admin rights in AUTH_CHANNEL")
 
-    # ---------------- Clone Mode ----------------
-    if CLONE_MODE is True:
-        print("Restarting All Clone Bots.......")
+    # Clone bots restart
+    if CLONE_MODE:
+        print("Restarting clone bots...")
         await restart_bots()
-        print("Restarted All Clone Bots.")
+        print("Clone bots restarted.")
 
-    # ---------------- Web Server ----------------
+    # Web server
     app = web.AppRunner(await web_server())
     await app.setup()
     await web.TCPSite(app, "0.0.0.0", PORT).start()
@@ -138,6 +139,9 @@ async def start():
     await idle()
 
 
+# ============================================================
+#                          MAIN
+# ============================================================
 if __name__ == "__main__":
     try:
         loop.run_until_complete(start())
