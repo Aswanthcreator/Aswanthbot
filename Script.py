@@ -236,7 +236,7 @@ If you do not see the Requested Movie/Series file, look at the next page...</i><
 💾 Fɪʟᴇ Sɪᴢᴇ:  📦<code>{file_size}</code>
 
 
-🔗 [⚡ Jᴏɪɴ ᴄɪɴᴇᴍᴀ ʟᴏᴋᴀᴍ ⚡](https://t.me/Cinema_Lokam_Movie_Request)</b></blockquote>"""
+🔗 [⚡ Jᴏɪɴ ᴄɪɴᴇᴍᴀ ʟᴏᴋᴀᴍ ⚡](https://t.me/Cinema_Lokam_Movies_Group)</b></blockquote>"""
 
     IMDB_TEMPLATE_TXT = """
 <b><i>Query: {query}
