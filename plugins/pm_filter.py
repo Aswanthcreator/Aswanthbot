@@ -1976,6 +1976,33 @@ async def cb_handler(client: Client, query: CallbackQuery):
             reply_markup=reply_markup,
             parse_mode=enums.ParseMode.HTML
         )
+    elif query.data == "owner":
+        btn = [[
+            InlineKeyboardButton("⬅️ Bᴀᴄᴋ", callback_data="help"),
+            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="https://t.me/Aswanthcreator")
+        ]]
+        reply_markup = InlineKeyboardMarkup(btn)
+        await query.message.edit_text(
+            text="● ◌ ◌"
+        )
+        await query.message.edit_text(
+            text="● ● ◌"
+        )
+        await query.message.edit_text(
+            text="● ● ●"
+        )
+        reply_markup = InlineKeyboardMarkup(btn)
+        await client.edit_message_media(
+            query.message.chat.id, 
+            query.message.id, 
+            InputMediaPhoto(random.choice(PICS))
+        )
+        reply_markup = InlineKeyboardMarkup(btn)
+        await query.message.edit_text(
+            text=(script.OWNER_TXT),
+            reply_markup=reply_markup,
+            parse_mode=enums.ParseMode.HTML
+        )
     elif query.data == "subscription":
         buttons = [[
             InlineKeyboardButton('⬅️ Bᴀᴄᴋ', callback_data='start')
@@ -2266,9 +2293,9 @@ async def cb_handler(client: Client, query: CallbackQuery):
     elif query.data == "tele":
         btn = [[
             InlineKeyboardButton("⬅️ Bᴀᴄᴋ", callback_data="help"),
-            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="telegram.me/MyselfNeon")
+            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="https://t.me/Aswanthcreator")
         ]]
-        reply_markup = InlineKeyboardMarkup(buttons)
+        reply_markup = InlineKeyboardMarkup(btn)
         await query.message.edit_text(
             text="● ◌ ◌"
         )
@@ -2278,7 +2305,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         await query.message.edit_text(
             text="● ● ●"
         )
-        reply_markup = InlineKeyboardMarkup(buttons)
+        reply_markup = InlineKeyboardMarkup(btn)
         await client.edit_message_media(
             query.message.chat.id, 
             query.message.id, 
@@ -2318,9 +2345,9 @@ async def cb_handler(client: Client, query: CallbackQuery):
     elif query.data == "mods":
         btn = [[
             InlineKeyboardButton("⬅️ Bᴀᴄᴋ", callback_data="help"),
-            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="telegram.me/MyselfNeon")
+            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="https://t.me/Aswanthcreator")
         ]]
-        reply_markup = InlineKeyboardMarkup(buttons)
+        reply_markup = InlineKeyboardMarkup(btn)
         await query.message.edit_text(
             text="● ◌ ◌"
         )
@@ -2330,7 +2357,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         await query.message.edit_text(
             text="● ● ●"
         )
-        reply_markup = InlineKeyboardMarkup(buttons)
+        reply_markup = InlineKeyboardMarkup(btn)
         await client.edit_message_media(
             query.message.chat.id, 
             query.message.id, 
@@ -2345,9 +2372,9 @@ async def cb_handler(client: Client, query: CallbackQuery):
     elif query.data == "song":
         btn = [[
             InlineKeyboardButton("⬅️ Bᴀᴄᴋ", callback_data="help"),
-            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="telegram.me/MyselfNeon")
+            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="https://t.me/Aswanthcreator")
         ]]
-        reply_markup = InlineKeyboardMarkup(buttons)
+        reply_markup = InlineKeyboardMarkup(btn)
         await query.message.edit_text(
             text="● ◌ ◌"
         )
@@ -2357,7 +2384,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         await query.message.edit_text(
             text="● ● ●"
         )
-        reply_markup = InlineKeyboardMarkup(buttons)
+        reply_markup = InlineKeyboardMarkup(btn)
         await client.edit_message_media(
             query.message.chat.id, 
             query.message.id, 
@@ -2397,9 +2424,9 @@ async def cb_handler(client: Client, query: CallbackQuery):
     elif query.data == "sticker":
         btn = [[
             InlineKeyboardButton("⬅️ Bᴀᴄᴋ", callback_data="help"),
-            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="telegram.me/MyselfNeon")
+            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="https://t.me/Aswanthcreator")
         ]]
-        reply_markup = InlineKeyboardMarkup(buttons)
+        reply_markup = InlineKeyboardMarkup(btn)
         await query.message.edit_text(
             text="● ◌ ◌"
         )
@@ -2409,7 +2436,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         await query.message.edit_text(
             text="● ● ●"
         )
-        reply_markup = InlineKeyboardMarkup(buttons)
+        reply_markup = InlineKeyboardMarkup(btn)
         await client.edit_message_media(
             query.message.chat.id, 
             query.message.id, 
@@ -2424,7 +2451,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
     elif query.data == "tamil_info":
         btn = [[
             InlineKeyboardButton("⬅️ Bᴀᴄᴋ", callback_data="start"),
-            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="telegram.me/MyselfNeon")
+            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="https://t.me/Aswanthcreator")
         ]]
         await client.edit_message_media(
             query.message.chat.id, 
@@ -2440,7 +2467,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
     elif query.data == "english_info":
         btn = [[
             InlineKeyboardButton("⬅️ Bᴀᴄᴋ", callback_data="start"),
-            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="telegram.me/MyselfNeon")
+            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="https://t.me/Aswanthcreator")
         ]]
         await client.edit_message_media(
             query.message.chat.id, 
@@ -2456,7 +2483,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
     elif query.data == "hindi_info":
         btn = [[
             InlineKeyboardButton("⬅️ Bᴀᴄᴋ", callback_data="start"),
-            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="telegram.me/MyselfNeon")
+            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="https://t.me/Aswanthcreator")
         ]]
         await client.edit_message_media(
             query.message.chat.id, 
@@ -2472,7 +2499,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
     elif query.data == "telugu_info":
         btn = [[
             InlineKeyboardButton("⬅️ Bᴀᴄᴋ", callback_data="start"),
-            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="telegram.me/MyselfNeon")
+            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="https://t.me/Aswanthcreator")
         ]]
         await client.edit_message_media(
             query.message.chat.id, 
@@ -2488,7 +2515,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
     elif query.data == "malayalam_info":
         btn = [[
             InlineKeyboardButton("⬅️ Bᴀᴄᴋ", callback_data="start"),
-            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="telegram.me/MyselfNeon")
+            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="https://t.me/Aswanthcreator")
         ]]
         await client.edit_message_media(
             query.message.chat.id, 
@@ -2504,7 +2531,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
     elif query.data == "urdu_info":
         btn = [[
             InlineKeyboardButton("⬅️ Bᴀᴄᴋ", callback_data="start"),
-            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="telegram.me/MyselfNeon")
+            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="https://t.me/Aswanthcreator")
         ]]
         await client.edit_message_media(
             query.message.chat.id, 
@@ -2520,7 +2547,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
     elif query.data == "bangladesh_info":
         btn = [[
             InlineKeyboardButton("⬅️ Bᴀᴄᴋ", callback_data="start"),
-            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="telegram.me/MyselfNeon")
+            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="https://t.me/Aswanthcreator")
         ]]
         await client.edit_message_media(
             query.message.chat.id, 
@@ -2536,7 +2563,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
     elif query.data == "kannada_info":
         btn = [[
             InlineKeyboardButton("⬅️ Bᴀᴄᴋ", callback_data="start"),
-            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="telegram.me/MyselfNeon")
+            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="https://t.me/Aswanthcreator")
         ]]
         await client.edit_message_media(
             query.message.chat.id, 
@@ -2552,7 +2579,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
     elif query.data == "gujarati_info":
         btn = [[
             InlineKeyboardButton("⬅️ Bᴀᴄᴋ", callback_data="start"),
-            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="telegram.me/MyselfNeon")
+            InlineKeyboardButton("Cᴏɴᴛᴀᴄᴛ", url="https://t.me/Aswanthcreator")
         ]]
         await client.edit_message_media(
             query.message.chat.id, 
@@ -3382,6 +3409,7 @@ async def global_filters(client, message, text=False):
 # Dont remove Credits
 # Developer Telegram @MyselfNeon
 # Update channel - @NeonFiles
+
 
 
 
