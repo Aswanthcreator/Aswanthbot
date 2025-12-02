@@ -1963,7 +1963,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             InlineKeyboardButton('Sᴏᴜʀᴄᴇ Cᴏᴅᴇ 🙏', url="https://t.me/DQBOTFUN")
         ],[
             InlineKeyboardButton('Hᴏᴍᴇ 🏠', callback_data='start'),
-            InlineKeyboardButton('Cʟᴏsᴇ ❌', callback_data='close_data')
+            InlineKeyboardButton('Sᴛᴀᴛᴜs 🌀', callback_data='stats')
         ]]
         await client.edit_message_media(
             query.message.chat.id, 
@@ -2207,6 +2207,17 @@ async def cb_handler(client: Client, query: CallbackQuery):
             InlineKeyboardButton('⬅️ Bᴀᴄᴋ', callback_data='help'),
             InlineKeyboardButton('♻️ Rᴇғʀᴇsʜ', callback_data='rfrsh')
         ]]
+        reply_markup = InlineKeyboardMarkup(buttons)
+        await query.message.edit_text(
+            text="● ◌ ◌"
+        )
+        await query.message.edit_text(
+            text="● ● ◌"
+        )
+        await query.message.edit_text(
+            text="● ● ●"
+        )
+        reply_markup = InlineKeyboardMarkup(buttons)
         await client.edit_message_media(
             query.message.chat.id, 
             query.message.id, 
@@ -3409,6 +3420,7 @@ async def global_filters(client, message, text=False):
 # Dont remove Credits
 # Developer Telegram @MyselfNeon
 # Update channel - @NeonFiles
+
 
 
 
