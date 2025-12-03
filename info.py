@@ -246,7 +246,7 @@ SLEEP_THRESHOLD = int(environ.get('SLEEP_THRESHOLD', '60'))
 PING_INTERVAL = int(environ.get("PING_INTERVAL", "1200"))  # 20 min
 
 ON_HEROKU = 'DYNO' in environ
-URL = environ.get("URL", "https://aswanthbot.onrender.com")
+URL = environ.get("URL", "https://aswanthbot.onrender.com/").rstrip("/") + "/"
 
 
 # ============================================================
@@ -276,6 +276,7 @@ REACTIONS = [
 # Dont remove Credits
 # Developer Telegram @MyselfNeon
 # Update channel - @NeonFiles
+
 
 
 
