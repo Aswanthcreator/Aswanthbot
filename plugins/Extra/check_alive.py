@@ -61,7 +61,7 @@ async def ping(_, message):
         f"⏱️ **__Ping:__** __{elapsed_ms:.2f} ms__\n"
         f"⏳ **__Uptime:__** __{uptime_str}__\n\n"
         f"**__{witty_line}__**\n"
-        f"**__@neonfiles__**"
+        f"**__@Cinema_Updates_OTT__**"
     )
 
     await temp_msg.edit(ping_text)
