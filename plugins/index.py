@@ -1,9 +1,17 @@
-import logging, re, asyncio
+import logging
+import re
+import asyncio
+
 from utils import temp
 from info import ADMINS
 from pyrogram import Client, filters, enums
 from pyrogram.errors import FloodWait, MessageNotModified
-from pyrogram.errors.exceptions.bad_request_400 import ChannelInvalid, ChatAdminRequired, UsernameInvalid, UsernameNotModified
+from pyrogram.errors.exceptions.bad_request_400 import (
+    ChannelInvalid,
+    ChatAdminRequired,
+    UsernameInvalid,
+    UsernameNotModified,
+)
 from info import INDEX_REQ_CHANNEL as LOG_CHANNEL
 from database.ia_filterdb import save_file
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -12,13 +20,22 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 lock = asyncio.Lock()
 
+# ---------- Callback handler for moderator buttons ----------
 @Client.on_callback_query(filters.regex(r'^index'))
 async def index_files(bot, query):
+    # cancel pressed from progress dialog
     if query.data.startswith('index_cancel'):
         temp.CANCEL = True
         return await query.answer("Cancelling Indexing")
-    _, raju, chat, lst_msg_id, from_user = query.data.split("#")
-    if raju == 'reject':
+
+    # expected format: index#action#chat#last_msg_id#from_user
+    try:
+        _, action, chat, lst_msg_id, from_user = query.data.split("#")
+    except Exception:
+        return await query.answer("Invalid data", show_alert=True)
+
+    if action == 'reject':
+        # moderator rejected the request
         await query.message.delete()
         await bot.send_message(
             int(from_user),
@@ -27,47 +44,67 @@ async def index_files(bot, query):
         )
         return
 
+    # only one indexing at a time
     if lock.locked():
         return await query.answer('Wait until previous process complete.', show_alert=True)
-    msg = query.message
 
+    msg = query.message
     await query.answer('Processing...⏳', show_alert=True)
+
+    # notify submitter if not admin
     if int(from_user) not in ADMINS:
         await bot.send_message(
             int(from_user),
             f'**__Your Submission For Indexing {chat} Has been Accepted By Our Moderators And Will Be Added Soon.__**',
             reply_to_message_id=int(lst_msg_id)
         )
+
+    # update moderator message
     await msg.edit(
         "Starting Indexing",
         reply_markup=InlineKeyboardMarkup(
             [[InlineKeyboardButton('Cancel', callback_data='index_cancel')]]
         )
     )
+
+    # ensure chat is int if possible
     try:
-        chat = int(chat)
-    except:
-        chat = chat
-    await index_files_to_db(int(lst_msg_id), chat, msg, bot)
+        chat_obj = int(chat)
+    except Exception:
+        chat_obj = chat
+
+    # start indexing
+    await index_files_to_db(int(lst_msg_id), chat_obj, msg, bot)
 
 
+# ---------- /index command for users ----------
 @Client.on_message(filters.private & filters.command('index'))
 async def send_for_index(bot, message):
-    neo = await bot.ask(message.chat.id, "**__Now Send Me Your Channel Last Post Link Or Forward A Last Message From Your Index Channel.\n\nAnd You Can Skip Number By__ \n/setskip __YᴏᴜʀSᴋɪᴘNᴜᴍʙᴇʀ__**")
-    if neo.forward_from_chat and neo.forward_from_chat.type == enums.ChatType.CHANNEL:
+    neo = await bot.ask(
+        message.chat.id,
+        "**__Now Send Me Your Channel Last Post Link Or Forward A Last Message From Your Index Channel.\n\nAnd You Can Skip Number By__ \n/setskip __YᴏᴜʀSᴋɪᴘNᴜᴍʙᴇʀ__**"
+    )
+
+    # forwarded message from a channel
+    if getattr(neo, "forward_from_chat", None) and neo.forward_from_chat.type == enums.ChatType.CHANNEL:
         last_msg_id = neo.forward_from_message_id
         chat_id = neo.forward_from_chat.username or neo.forward_from_chat.id
-    elif neo.text:
-        regex = re.compile("(https://)?(t\.me/|telegram\.me/|telegram\.dog/)(c/)?(\d+|[a-zA-Z_0-9]+)/(\d+)$")
-        match = regex.match(neo.text)
+
+    # text link
+    elif getattr(neo, "text", None):
+        regex = re.compile(r"(https://)?(t\.me/|telegram\.me/|telegram\.dog/)(c/)?(\d+|[a-zA-Z_0-9]+)/(\d+)$")
+        match = regex.match(neo.text.strip())
         if not match:
             return await neo.reply('**__Invalid Link 🚫\n\nTry Again By__ /index**')
         chat_id = match.group(4)
         last_msg_id = int(match.group(5))
         if chat_id.isnumeric():
-            chat_id  = int(("-100" + chat_id))
+            chat_id = int("-100" + chat_id)
+
     else:
         return
+
+    # verify bot can access chat
     try:
         await bot.get_chat(chat_id)
     except ChannelInvalid:
@@ -77,17 +114,20 @@ async def send_for_index(bot, message):
     except Exception as e:
         logger.exception(e)
         return await neo.reply(f'Errors - {e}')
+
+    # ensure message exists
     try:
         k = await bot.get_messages(chat_id, last_msg_id)
-    except:
+    except Exception:
         return await message.reply('**__Make Sure That I am An Admin In The Channel, If Channel Is Private__**')
     if k.empty:
         return await message.reply('**__This May Be Group And I Am Not Am Admin Of The Group__**')
 
+    # if admin — confirm right away in the same chat
     if message.from_user.id in ADMINS:
         buttons = [[
             InlineKeyboardButton('Cᴏɴғɪʀᴍ ✅', callback_data=f'index#accept#{chat_id}#{last_msg_id}#{message.from_user.id}')
-        ],[
+        ], [
             InlineKeyboardButton('Dᴇᴄʟɪɴᴇ ❌', callback_data='close_data')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
@@ -96,19 +136,22 @@ async def send_for_index(bot, message):
             reply_markup=reply_markup
         )
 
-    if type(chat_id) is int:
+    # if not admin — send to log channel for approval
+    if isinstance(chat_id, int):
         try:
             link = (await bot.create_chat_invite_link(chat_id)).invite_link
         except ChatAdminRequired:
             return await message.reply('**__Make Sure I am An Admin in the Chat and have Permission to Invite Users.__**')
     else:
-        link = f"@{message.forward_from_chat.username}"
+        link = f"@{neo.forward_from_chat.username}" if getattr(neo, "forward_from_chat", None) else f"@{chat_id}"
+
     buttons = [[
         InlineKeyboardButton('Aᴄᴄᴇᴘᴛ Iɴᴅᴇx', callback_data=f'index#accept#{chat_id}#{last_msg_id}#{message.from_user.id}')
-    ],[
+    ], [
         InlineKeyboardButton('Rᴇjᴇᴄᴛ Iɴᴅᴇx', callback_data=f'index#reject#{chat_id}#{message.id}#{message.from_user.id}'),
     ]]
     reply_markup = InlineKeyboardMarkup(buttons)
+
     await bot.send_message(
         LOG_CHANNEL,
         f'#IndexRequest\n\n**__By__ : {message.from_user.mention} (<code>{message.from_user.id}</code>)\n__Chat ID/ Username__ - <code> {chat_id}</code>\n__Last Message ID__ - <code>{last_msg_id}</code>\nInviteLink - {link}',
@@ -117,20 +160,22 @@ async def send_for_index(bot, message):
     await message.reply('**__ThankYou For the Contribution, Wait For My Moderators to Verify the Files.__**')
 
 
+# ---------- /setskip command ----------
 @Client.on_message(filters.command('setskip') & filters.user(ADMINS))
 async def set_skip_number(bot, message):
     if ' ' in message.text:
-        _, skip = message.text.split(" ")
+        _, skip = message.text.split(" ", 1)
         try:
             skip = int(skip)
-        except:
+        except Exception:
             return await message.reply("**__Skip Number Should Be An Integer__**")
-        await message.reply(f"**__Successfully Set SKIP Number As__** {skip}")
         temp.CURRENT = int(skip)
+        await message.reply(f"**__Successfully Set SKIP Number As__** {skip}")
     else:
         await message.reply("**__Give Me a Skip Number__**")
 
 
+# ---------- Core indexing function (batching fixed) ----------
 async def index_files_to_db(lst_msg_id, chat, msg, bot):
     total_files = 0
     duplicate = 0
@@ -138,55 +183,133 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
     deleted = 0
     no_media = 0
     unsupported = 0
+
+    # We'll start from lst_msg_id (last post) and go backwards.
+    # offset_id will be moved to last processed message id - 1 after each batch to avoid overlapping.
+    offset_id = int(lst_msg_id)
+
     async with lock:
         try:
-            current = temp.CURRENT
             temp.CANCEL = False
-            async for message in bot.iter_messages(chat, lst_msg_id, temp.CURRENT):
-                if temp.CANCEL:
-                    await msg.edit(f"**__Sᴜᴄᴄᴇssғᴜʟʟʏ Cᴀɴᴄᴇʟʟᴇᴅ 🥹\n\nSᴀᴠᴇᴅ__ <code>{total_files}</code> __Fɪʟᴇs Tᴏ Dᴀᴛᴀʙᴀsᴇ !\n__Dᴜᴘʟɪᴄᴀᴛᴇ Fɪʟᴇs Sᴋɪᴘᴘᴇᴅ :__ <code>{duplicate}</code>\n__Dᴇʟᴇᴛᴇᴅ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{deleted}</code>\n__Nᴏɴ-Mᴇᴅɪᴀ Msɢs :__ <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\n__Eʀʀᴏʀs Oᴄᴄᴜʀʀᴇᴅ :__ <code>{errors}</code>**")
-                    break
-                current += 1
-                if current % 200 == 0:
-                    can = [[InlineKeyboardButton('Cancel', callback_data='index_cancel')]]
-                    reply = InlineKeyboardMarkup(can)
-                    try:
-                        await msg.edit_text(
-                            text=f"**__Tᴏᴛᴀʟ Msɢs Fᴇᴛᴄʜᴇᴅ :__ <code>{current}</code>\n__Tᴏᴛᴀʟ Msɢs Sᴀᴠᴇᴅ :__ <code>{total_files}</code>\n__Dᴜᴘʟɪᴄᴀᴛᴇ Fɪʟᴇs Sᴋɪᴘᴘᴇᴅ :__ <code>{duplicate}</code>\n__Dᴇʟᴇᴛᴇᴅ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{deleted}</code>\n__Nᴏɴ-Mᴇᴅɪᴀ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\n__Eʀʀᴏʀs Oᴄᴄᴜʀʀᴇᴅ :__ <code>{errors}</code>**",
-                            reply_markup=reply
+
+            while True:
+                # fetch up to 200 messages in a batch, starting from offset_id and going backwards
+                batch_iter = bot.iter_messages(
+                    chat_id=chat,
+                    offset_id=offset_id,
+                    reverse=False,
+                    limit=200  # fetch 200 messages per API call
+                )
+
+                batch_count = 0
+                last_processed_id = None
+                async for message in batch_iter:
+                    batch_count += 1
+                    last_processed_id = message.message_id if hasattr(message, "message_id") else getattr(message, "id", None)
+                    # Pyrogram Message usually uses .message_id in some contexts; .id or .message_id fallback
+                    if last_processed_id is None:
+                        last_processed_id = getattr(message, "id", None)
+
+                    # allow cancel
+                    if temp.CANCEL:
+                        await msg.edit(
+                            f"**__Sᴜᴄᴄᴇssғᴜʟʟʏ Cᴀɴᴄᴇʟʟᴇᴅ 🥹\n\nSᴀᴠᴇᴅ__ <code>{total_files}</code> __Fɪʟᴇs Tᴏ Dᴀᴛᴀʙᴀsᴇ !\n__Dᴜᴘʟɪᴄᴀᴛᴇ Fɪʟᴇs Sᴋɪᴘᴘᴇᴅ :__ <code>{duplicate}</code>\n__Dᴇʟᴇᴛᴇᴅ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{deleted}</code>\n__Nᴏɴ-Mᴇᴅɪᴀ Msɢs :__ <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\n__Eʀʀᴏʀs Oᴄᴄᴜʀʀᴇᴅ :__ <code>{errors}</code>**"
                         )
-                    except MessageNotModified:
-                        pass
-                if message.empty:
-                    deleted += 1
-                    continue
-                elif not message.media:
-                    no_media += 1
-                    continue
-                elif message.media not in [enums.MessageMediaType.VIDEO, enums.MessageMediaType.AUDIO, enums.MessageMediaType.DOCUMENT]:
-                    unsupported += 1
-                    continue
-                media = getattr(message, message.media.value, None)
-                if not media:
-                    unsupported += 1
-                    continue
-                media.caption = message.caption
-                aynav, vnay = await save_file(media)
-                if aynav:
-                    total_files += 1
-                elif vnay == 0:
-                    duplicate += 1
-                elif vnay == 2:
-                    errors += 1
+                        return
+
+                    # handle deleted/empty
+                    if getattr(message, "empty", False):
+                        deleted += 1
+                        continue
+
+                    # no media
+                    if not getattr(message, "media", None):
+                        no_media += 1
+                        continue
+
+                    # only accept video/audio/document
+                    if message.media not in [
+                        enums.MessageMediaType.VIDEO,
+                        enums.MessageMediaType.AUDIO,
+                        enums.MessageMediaType.DOCUMENT,
+                    ]:
+                        unsupported += 1
+                        continue
+
+                    # get the concrete media object (video/document/audio)
+                    media = getattr(message, message.media.value, None)
+                    # fallback
+                    if not media:
+                        unsupported += 1
+                        continue
+
+                    # set caption
+                    media.caption = message.caption
+
+                    # save to DB (your save_file returns (ok, status))
+                    try:
+                        ok, status = await save_file(media)
+                    except Exception as e:
+                        logger.exception(f"save_file error: {e}")
+                        errors += 1
+                        continue
+
+                    if ok:
+                        total_files += 1
+                    elif status == 0:
+                        duplicate += 1
+                    else:
+                        errors += 1
+
+                # finished iterating this batch
+                if batch_count == 0:
+                    # no more messages
+                    break
+
+                # prepare next offset_id to fetch older messages (avoid overlap)
+                # last_processed_id is the smallest id in this batch because reverse=False yields newest->older
+                try:
+                    # subtract 1 to avoid processing the same message again
+                    offset_id = int(last_processed_id) - 1 if last_processed_id is not None else offset_id - 1
+                except Exception:
+                    offset_id = offset_id - 1
+
+                # update progress message after each batch (every 200 messages processed)
+                can = [[InlineKeyboardButton('Cancel', callback_data='index_cancel')]]
+                reply = InlineKeyboardMarkup(can)
+                try:
+                    await msg.edit_text(
+                        text=(
+                            f"**__Tᴏᴛᴀʟ Msɢs Pʀᴏᴄᴇssᴇᴅ (approx):__ <code>{total_files + duplicate + errors + deleted + no_media + unsupported}</code>\n"
+                            f"__Tᴏᴛᴀʟ Fɪʟᴇs Sᴀᴠᴇᴅ :__ <code>{total_files}</code>\n"
+                            f"__Dᴜᴘʟɪᴄᴀᴛᴇ Fɪʟᴇs Sᴋɪᴘᴘᴇᴅ :__ <code>{duplicate}</code>\n"
+                            f"__Dᴇʟᴇᴛᴇᴅ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{deleted}</code>\n"
+                            f"__Nᴏɴ-Mᴇᴅɪᴀ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\n"
+                            f"__Eʀʀᴏʀs Oᴄᴄᴜʀʀᴇᴅ :__ <code>{errors}</code>**"
+                        ),
+                        reply_markup=reply
+                    )
+                except MessageNotModified:
+                    pass
+                except Exception:
+                    # ignore other edit errors (flood, etc.)
+                    pass
+
+            # finished indexing
+            await msg.edit(
+                f'**__Sᴜᴄᴄᴇssғᴜʟʟʏ Sᴀᴠᴇᴅ__ ✅ : <code>{total_files}</code> __To DataBase!\n'
+                f'__Dᴜᴘʟɪᴄᴀᴛᴇ Fɪʟᴇs Sᴋɪᴘᴘᴇᴅ :__ <code>{duplicate}</code>\n'
+                f'__Dᴇʟᴇᴛᴇᴅ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{deleted}</code>\n'
+                f'__Nᴏɴ-Mᴇᴅɪᴀ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\n'
+                f'__Eʀʀᴏʀs Oᴄᴄᴜʀʀᴇᴅ__ : <code>{errors}</code>**'
+            )
+
         except Exception as e:
             logger.exception(e)
-            k = await msg.edit(f'**__Error: {e}__**')
-            await k.reply_text(f'**__Sᴜᴄᴄᴇssғᴜʟʟʏ Sᴀᴠᴇᴅ__ ✅ : <code>{total_files}</code> __Tᴏ Dᴀᴛᴀʙᴀsᴇ__\n__Dᴜᴘʟɪᴄᴀᴛᴇ Fɪʟᴇs Sᴋɪᴘᴘᴇᴅ :__ <code>{duplicate}</code>\n__Dᴇʟᴇᴛᴇᴅ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{deleted}</code>\n__Nᴏɴ-Mᴇᴅɪᴀ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\n__Eʀʀᴏʀs Oᴄᴄᴜʀʀᴇᴅ :__ <code>{errors}</code>**')
-            await k.reply_text("**__If You Get Message Not Modified Error Then Skip Your Saved File Then Index Again__**")
-        else:
-            await msg.edit(f'**__Sᴜᴄᴄᴇssғᴜʟʟʏ Sᴀᴠᴇᴅ__ ✅ : <code>{total_files}</code> __To DataBase!\nDᴜᴘʟɪᴄᴀᴛᴇ Fɪʟᴇs Sᴋɪᴘᴘᴇᴅ :__ <code>{duplicate}</code>\n__Dᴇʟᴇᴛᴇᴅ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{deleted}</code>\n__Nᴏɴ-Mᴇᴅɪᴀ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\n__Eʀʀᴏʀs Oᴄᴄᴜʀʀᴇᴅ__ : <code>{errors}</code>**')
-
-
-
-                                  
-
+            try:
+                await msg.edit(f'**__Error: {e}__**')
+            except Exception:
+                pass
+        finally:
+            # reset CANCEL so future runs start fresh
+            temp.CANCEL = False
