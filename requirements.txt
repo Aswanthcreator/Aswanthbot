@@ -1,7 +1,7 @@
 # --- Core Bot Framework ---
 pyrofork==2.3.45
 tgcrypto
-
+flask
 # --- Database & ORM ---
 pymongo[srv]==3.12.3
 motor==2.5.1
@@ -63,6 +63,7 @@ git+https://github.com/Joelkb/cinemagoer
 # --- NEW (added for your improved plugin) ---
 # These ensure SSL retry logic & async downloads work perfectly
 async-timeout==4.0.3
+
 
 
 
