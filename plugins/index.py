@@ -186,7 +186,7 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
 
     # We'll start from lst_msg_id (last post) and go backwards.
     # offset_id will be moved to last processed message id - 1 after each batch to avoid overlapping.
-    offset_id = int(lst_msg_id)
+    offset = int(lst_msg_id)
 
     async with lock:
         try:
@@ -196,7 +196,7 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
                 # fetch up to 200 messages in a batch, starting from offset_id and going backwards
                 batch_iter = bot.iter_messages(
                     chat_id=chat,
-                    offset_id=offset_id,
+                    offset=offset,
                     reverse=False,
                     limit=200  # fetch 200 messages per API call
                 )
@@ -270,9 +270,9 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
                 # last_processed_id is the smallest id in this batch because reverse=False yields newest->older
                 try:
                     # subtract 1 to avoid processing the same message again
-                    offset_id = int(last_processed_id) - 1 if last_processed_id is not None else offset_id - 1
+                    offset = int(last_processed_id) - 1 if last_processed_id is not None else offset - 1
                 except Exception:
-                    offset_id = offset_id - 1
+                    offset = offset - 1
 
                 # update progress message after each batch (every 200 messages processed)
                 can = [[InlineKeyboardButton('Cancel', callback_data='index_cancel')]]
@@ -313,3 +313,4 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
         finally:
             # reset CANCEL so future runs start fresh
             temp.CANCEL = False
+
