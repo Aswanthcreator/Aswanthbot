@@ -22,8 +22,6 @@ from Neon.util.keepalive import ping_server
 from Neon.bot.clients import initialize_clients
 
 # ---------------- Keep Alive ----------------
-from keep_alive import keep_alive
-keep_alive()
 import aiohttp
 async def keep_alive():
     async with aiohttp.ClientSession() as session:
@@ -149,4 +147,5 @@ if __name__ == "__main__":
         loop.run_until_complete(start())
     except KeyboardInterrupt:
         logging.info("Service Stopped Bye 👋")
+
 
