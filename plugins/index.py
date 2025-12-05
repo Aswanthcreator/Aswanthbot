@@ -74,6 +74,7 @@ async def index_files(bot, query):
         chat_obj = chat
 
     # start indexing
+    # pass lst_msg_id as int (it's the last message id forwarded by user)
     await index_files_to_db(int(lst_msg_id), chat_obj, msg, bot)
 
 
@@ -175,8 +176,14 @@ async def set_skip_number(bot, message):
         await message.reply("**__Give Me a Skip Number__**")
 
 
-# ---------- Core indexing function (batching fixed) ----------
+# ---------- Core indexing function (fixed for New -> Old) ----------
 async def index_files_to_db(lst_msg_id, chat, msg, bot):
+    """
+    lst_msg_id: integer message id to start from (the last/most recent message forwarded by user)
+    chat: chat id or username
+    msg: the moderator message object used for progress updates
+    bot: pyrogram client
+    """
     total_files = 0
     duplicate = 0
     errors = 0
@@ -184,80 +191,121 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
     no_media = 0
     unsupported = 0
 
-    offset = 0     # IMPORTANT: Pyrogram v1 offset = message count, not msgID
-
+    # we lock to ensure single indexing at a time
     async with lock:
         try:
             temp.CANCEL = False
 
-            while True:
+            # ---- Process the starting/fwd message first (if it exists) ----
+            try:
+                start_msg = await bot.get_messages(chat, lst_msg_id)
+            except Exception as e:
+                logger.exception("Failed to fetch starting message: %s", e)
+                await msg.edit(f"**__Failed to fetch start message: {e}__**")
+                return
 
-                batch = bot.iter_messages(
-                    chat_id=chat,
-                    offset=offset,
-                    limit=200        # always fetch 200 per stretch
-                )
+            # helper to process a single message object
+            async def _process_message(message):
+                nonlocal total_files, duplicate, errors, deleted, no_media, unsupported
+                if temp.CANCEL:
+                    return False  # caller will handle cancellation
+
+                if not message or message.empty:
+                    deleted += 1
+                    return True
+
+                if not message.media:
+                    no_media += 1
+                    return True
+
+                if message.media not in [
+                    enums.MessageMediaType.VIDEO,
+                    enums.MessageMediaType.AUDIO,
+                    enums.MessageMediaType.DOCUMENT,
+                ]:
+                    unsupported += 1
+                    return True
+
+                media = getattr(message, message.media.value, None)
+                if not media:
+                    unsupported += 1
+                    return True
+
+                # keep caption on the media object as your save_file expects
+                media.caption = message.caption
+
+                try:
+                    ok, status = await save_file(media)
+                except Exception as e:
+                    logger.exception("save_file error: %s", e)
+                    errors += 1
+                    return True
+
+                if ok:
+                    total_files += 1
+                elif status == 0:
+                    duplicate += 1
+                else:
+                    errors += 1
+
+                return True
+
+            # process the starting message explicitly (so indexing starts exactly from forwarded message)
+            if start_msg and not start_msg.empty:
+                await _process_message(start_msg)
+
+            # current_offset will be decreased as we move older
+            # start from (lst_msg_id - 1) to fetch older messages
+            current_offset_id = lst_msg_id - 1 if isinstance(lst_msg_id, int) else None
+
+            # batching loop: fetch older messages in chunks of 200
+            while True:
+                if temp.CANCEL:
+                    await msg.edit(
+                        f"**__Sᴜᴄᴄᴇssғᴜʟʟʏ Cᴀɴᴄᴇʟʟᴇᴅ 🥹\n\nSᴀᴠᴇᴅ__ <code>{total_files}</code> __Fɪʟᴇs Tᴏ Dᴀᴛᴀʙᴀsᴇ !\n__Dᴜᴘʟɪᴄᴀᴛᴇ Fɪʟᴇs :__ <code>{duplicate}</code>\n__Dᴇʟᴇᴛᴇᴅ :__ <code>{deleted}</code>\n__Nᴏɴ-Mᴇᴅɪᴀ :__ <code>{no_media + unsupported}</code>(Unsupported `{unsupported}` )\n__Eʀʀᴏʀs :__ <code>{errors}</code>**"
+                    )
+                    return
+
+                # fetch a batch of older messages
+                try:
+                    # offset_id points to the message id from which pyrogram will fetch older messages
+                    batch = bot.iter_messages(
+                        chat_id=chat,
+                        offset_id=current_offset_id,
+                        limit=200
+                    )
+                except Exception as e:
+                    logger.exception("iter_messages failed: %s", e)
+                    await msg.edit(f"**__Failed while fetching messages: {e}__**")
+                    return
 
                 count = 0
-                last_id = None
+                last_id_in_batch = None
 
                 async for message in batch:
-                    count += 1
-                    last_id = message.message_id
-
+                    # safety: stop if cancellation requested
                     if temp.CANCEL:
-                        await msg.edit(
-                            f"**__Sᴜᴄᴄᴇssғᴜʟʟʏ Cᴀɴᴄᴇʟʟᴇᴅ 🥹\n\nSᴀᴠᴇᴅ__ <code>{total_files}</code> __Fɪʟᴇs Tᴏ Dᴀᴛᴀʙᴀsᴇ !\n__Dᴜᴘʟɪᴄᴀᴛᴇ Fɪʟᴇs :__ <code>{duplicate}</code>\n__Dᴇʟᴇᴛᴇᴅ :__ <code>{deleted}</code>\n__Nᴏɴ-Mᴇᴅɪᴀ :__ <code>{no_media + unsupported}</code>(Unsupported `{unsupported}` )\n__Eʀʀᴏʀs :__ <code>{errors}</code>**"
-                        )
-                        return
+                        break
 
-                    if message.empty:
-                        deleted += 1
-                        continue
+                    # iterate older messages (message.message_id should be <= current_offset_id)
+                    count += 1
+                    last_id_in_batch = message.message_id
 
-                    if not message.media:
-                        no_media += 1
-                        continue
+                    await _process_message(message)
 
-                    if message.media not in [
-                        enums.MessageMediaType.VIDEO,
-                        enums.MessageMediaType.AUDIO,
-                        enums.MessageMediaType.DOCUMENT,
-                    ]:
-                        unsupported += 1
-                        continue
-
-                    media = getattr(message, message.media.value, None)
-                    if not media:
-                        unsupported += 1
-                        continue
-
-                    media.caption = message.caption
-
-                    try:
-                        ok, status = await save_file(media)
-                    except:
-                        errors += 1
-                        continue
-
-                    if ok:
-                        total_files += 1
-                    elif status == 0:
-                        duplicate += 1
-                    else:
-                        errors += 1
-
+                # if no messages returned, we're done
                 if count == 0:
-                    break   # indexing completed
+                    break
 
-                # NEXT BATCH
-                offset += 200
+                # prepare next offset: continue from older than last_id_in_batch
+                # subtract 1 to avoid reprocessing last message (ids are integers)
+                current_offset_id = last_id_in_batch - 1 if last_id_in_batch else None
 
-                # progress update
+                # progress update (non-blocking)
                 try:
                     can = [[InlineKeyboardButton('Cancel', callback_data='index_cancel')]]
                     await msg.edit_text(
-                        f"**Processed:** <code>{offset}</code>\n"
+                        f"**Processed:** <code>{lst_msg_id - (current_offset_id if current_offset_id else 0)}</code>\n"
                         f"**Saved:** <code>{total_files}</code>\n"
                         f"**Duplicate:** <code>{duplicate}</code>\n"
                         f"**Deleted:** <code>{deleted}</code>\n"
@@ -265,9 +313,14 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
                         f"**Errors:** <code>{errors}</code>",
                         reply_markup=InlineKeyboardMarkup(can)
                     )
-                except:
+                except Exception:
+                    # ignore UI update failures
                     pass
 
+                # small safety sleep to avoid FloodWait spikes
+                await asyncio.sleep(0.1)
+
+            # finished
             await msg.edit(
                 f'**__Finished__ ✅ : <code>{total_files}</code>\n'
                 f'__Duplicates__ : <code>{duplicate}</code>\n'
@@ -275,6 +328,5 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
                 f'__Non-Media__ : <code>{no_media + unsupported}</code>\n'
                 f'__Errors__ : <code>{errors}</code>**'
             )
-
         finally:
             temp.CANCEL = False
