@@ -4,7 +4,8 @@ import asyncio
 
 from utils import temp
 from info import ADMINS
-from pyrogram import Client, filters, enums
+from pyrogram import Client, filters, enum
+from pyrogram.enums import ChatMemberStatus, MessageMediaType
 from pyrogram.errors import FloodWait, MessageNotModified
 from pyrogram.errors.exceptions.bad_request_400 import (
     ChannelInvalid,
@@ -330,3 +331,4 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
             )
         finally:
             temp.CANCEL = False
+
