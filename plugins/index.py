@@ -184,40 +184,38 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
     no_media = 0
     unsupported = 0
 
-    # We'll start from lst_msg_id (last post) and go backwards.
-    offset = int(lst_msg_id)
+    offset = 0     # IMPORTANT: Pyrogram v1 offset = message count, not msgID
 
     async with lock:
         try:
             temp.CANCEL = False
 
             while True:
-                # FIXED: Pyrogram v2 uses offset_id instead of offset & no reverse param
-                batch_iter = bot.iter_messages(
+
+                batch = bot.iter_messages(
                     chat_id=chat,
-                    offset_id=offset,
-                    limit=200
+                    offset=offset,
+                    limit=200        # always fetch 200 per stretch
                 )
 
-                batch_count = 0
-                last_processed_id = None
+                count = 0
+                last_id = None
 
-                async for message in batch_iter:
-                    batch_count += 1
-                    last_processed_id = message.id
+                async for message in batch:
+                    count += 1
+                    last_id = message.message_id
 
-                    # cancel
                     if temp.CANCEL:
                         await msg.edit(
-                            f"**__Sᴜᴄᴄᴇssғᴜʟʟʏ Cᴀɴᴄᴇʟʟᴇᴅ 🥹\n\nSᴀᴠᴇᴅ__ <code>{total_files}</code> __Fɪʟᴇs Tᴏ Dᴀᴛᴀʙᴀsᴇ !\n__Dᴜᴘʟɪᴄᴀᴛᴇ Fɪʟᴇs Sᴋɪᴘᴘᴇᴅ :__ <code>{duplicate}</code>\n__Dᴇʟᴇᴛᴇᴅ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{deleted}</code>\n__Nᴏɴ-Mᴇᴅɪᴀ Msɢs :__ <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\n__Eʀʀᴏʀs Oᴄᴄᴜʀʀᴇᴅ :__ <code>{errors}</code>**"
+                            f"**__Sᴜᴄᴄᴇssғᴜʟʟʏ Cᴀɴᴄᴇʟʟᴇᴅ 🥹\n\nSᴀᴠᴇᴅ__ <code>{total_files}</code> __Fɪʟᴇs Tᴏ Dᴀᴛᴀʙᴀsᴇ !\n__Dᴜᴘʟɪᴄᴀᴛᴇ Fɪʟᴇs :__ <code>{duplicate}</code>\n__Dᴇʟᴇᴛᴇᴅ :__ <code>{deleted}</code>\n__Nᴏɴ-Mᴇᴅɪᴀ :__ <code>{no_media + unsupported}</code>(Unsupported `{unsupported}` )\n__Eʀʀᴏʀs :__ <code>{errors}</code>**"
                         )
                         return
 
-                    if getattr(message, "empty", False):
+                    if message.empty:
                         deleted += 1
                         continue
 
-                    if not getattr(message, "media", None):
+                    if not message.media:
                         no_media += 1
                         continue
 
@@ -238,8 +236,7 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
 
                     try:
                         ok, status = await save_file(media)
-                    except Exception as e:
-                        logger.exception(f"save_file error: {e}")
+                    except:
                         errors += 1
                         continue
 
@@ -250,45 +247,34 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
                     else:
                         errors += 1
 
-                if batch_count == 0:
-                    break  # finished channel
+                if count == 0:
+                    break   # indexing completed
 
-                # next batch starts 1 lower
-                offset = last_processed_id - 1
+                # NEXT BATCH
+                offset += 200
 
-                # update progress every batch
-                can = [[InlineKeyboardButton('Cancel', callback_data='index_cancel')]]
-                reply = InlineKeyboardMarkup(can)
-
+                # progress update
                 try:
+                    can = [[InlineKeyboardButton('Cancel', callback_data='index_cancel')]]
                     await msg.edit_text(
-                        text=(
-                            f"**__Tᴏᴛᴀʟ Msɢs Pʀᴏᴄᴇssᴇᴅ (approx):__ <code>{total_files + duplicate + errors + deleted + no_media + unsupported}</code>\n"
-                            f"__Tᴏᴛᴀʟ Fɪʟᴇs Sᴀᴠᴇᴅ :__ <code>{total_files}</code>\n"
-                            f"__Dᴜᴘʟɪᴄᴀᴛᴇ Fɪʟᴇs Sᴋɪᴘᴘᴇᴅ :__ <code>{duplicate}</code>\n"
-                            f"__Dᴇʟᴇᴛᴇᴅ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{deleted}</code>\n"
-                            f"__Nᴏɴ-Mᴇᴅɪᴀ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\n"
-                            f"__Eʀʀᴏʀs Oᴄᴄᴜʀʀᴇᴅ :__ <code>{errors}</code>**"
-                        ),
-                        reply_markup=reply
+                        f"**Processed:** <code>{offset}</code>\n"
+                        f"**Saved:** <code>{total_files}</code>\n"
+                        f"**Duplicate:** <code>{duplicate}</code>\n"
+                        f"**Deleted:** <code>{deleted}</code>\n"
+                        f"**No Media:** <code>{no_media + unsupported}</code>\n"
+                        f"**Errors:** <code>{errors}</code>",
+                        reply_markup=InlineKeyboardMarkup(can)
                     )
                 except:
                     pass
 
-            # finish message
             await msg.edit(
-                f'**__Sᴜᴄᴄᴇssғᴜʟʟʏ Sᴀᴠᴇᴅ__ ✅ : <code>{total_files}</code> __To DataBase!\n'
-                f'__Dᴜᴘʟɪᴄᴀᴛᴇ Fɪʟᴇs Sᴋɪᴘᴘᴇᴅ :__ <code>{duplicate}</code>\n'
-                f'__Dᴇʟᴇᴛᴇᴅ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{deleted}</code>\n'
-                f'__Nᴏɴ-Mᴇᴅɪᴀ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\n'
-                f'__Eʀʀᴏʀs Oᴄᴄᴜʀʀᴇᴅ__ : <code>{errors}</code>**'
+                f'**__Finished__ ✅ : <code>{total_files}</code>\n'
+                f'__Duplicates__ : <code>{duplicate}</code>\n'
+                f'__Deleted__ : <code>{deleted}</code>\n'
+                f'__Non-Media__ : <code>{no_media + unsupported}</code>\n'
+                f'__Errors__ : <code>{errors}</code>**'
             )
 
-        except Exception as e:
-            logger.exception(e)
-            try:
-                await msg.edit(f'**__Error: {e}__**')
-            except:
-                pass
         finally:
             temp.CANCEL = False
