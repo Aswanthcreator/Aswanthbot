@@ -185,7 +185,6 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
     unsupported = 0
 
     # We'll start from lst_msg_id (last post) and go backwards.
-    # offset_id will be moved to last processed message id - 1 after each batch to avoid overlapping.
     offset = int(lst_msg_id)
 
     async with lock:
@@ -193,41 +192,35 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
             temp.CANCEL = False
 
             while True:
-                # fetch up to 200 messages in a batch, starting from offset_id and going backwards
+                # FIXED: Pyrogram v2 uses offset_id instead of offset & no reverse param
                 batch_iter = bot.iter_messages(
                     chat_id=chat,
-                    offset=offset,
-                    reverse=False,
-                    limit=200  # fetch 200 messages per API call
+                    offset_id=offset,
+                    limit=200
                 )
 
                 batch_count = 0
                 last_processed_id = None
+
                 async for message in batch_iter:
                     batch_count += 1
-                    last_processed_id = message.message_id if hasattr(message, "message_id") else getattr(message, "id", None)
-                    # Pyrogram Message usually uses .message_id in some contexts; .id or .message_id fallback
-                    if last_processed_id is None:
-                        last_processed_id = getattr(message, "id", None)
+                    last_processed_id = message.id
 
-                    # allow cancel
+                    # cancel
                     if temp.CANCEL:
                         await msg.edit(
                             f"**__Sᴜᴄᴄᴇssғᴜʟʟʏ Cᴀɴᴄᴇʟʟᴇᴅ 🥹\n\nSᴀᴠᴇᴅ__ <code>{total_files}</code> __Fɪʟᴇs Tᴏ Dᴀᴛᴀʙᴀsᴇ !\n__Dᴜᴘʟɪᴄᴀᴛᴇ Fɪʟᴇs Sᴋɪᴘᴘᴇᴅ :__ <code>{duplicate}</code>\n__Dᴇʟᴇᴛᴇᴅ Msɢs Sᴋɪᴘᴘᴇᴅ :__ <code>{deleted}</code>\n__Nᴏɴ-Mᴇᴅɪᴀ Msɢs :__ <code>{no_media + unsupported}</code>(Unsupported Media - `{unsupported}` )\n__Eʀʀᴏʀs Oᴄᴄᴜʀʀᴇᴅ :__ <code>{errors}</code>**"
                         )
                         return
 
-                    # handle deleted/empty
                     if getattr(message, "empty", False):
                         deleted += 1
                         continue
 
-                    # no media
                     if not getattr(message, "media", None):
                         no_media += 1
                         continue
 
-                    # only accept video/audio/document
                     if message.media not in [
                         enums.MessageMediaType.VIDEO,
                         enums.MessageMediaType.AUDIO,
@@ -236,17 +229,13 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
                         unsupported += 1
                         continue
 
-                    # get the concrete media object (video/document/audio)
                     media = getattr(message, message.media.value, None)
-                    # fallback
                     if not media:
                         unsupported += 1
                         continue
 
-                    # set caption
                     media.caption = message.caption
 
-                    # save to DB (your save_file returns (ok, status))
                     try:
                         ok, status = await save_file(media)
                     except Exception as e:
@@ -261,22 +250,16 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
                     else:
                         errors += 1
 
-                # finished iterating this batch
                 if batch_count == 0:
-                    # no more messages
-                    break
+                    break  # finished channel
 
-                # prepare next offset_id to fetch older messages (avoid overlap)
-                # last_processed_id is the smallest id in this batch because reverse=False yields newest->older
-                try:
-                    # subtract 1 to avoid processing the same message again
-                    offset = int(last_processed_id) - 1 if last_processed_id is not None else offset - 1
-                except Exception:
-                    offset = offset - 1
+                # next batch starts 1 lower
+                offset = last_processed_id - 1
 
-                # update progress message after each batch (every 200 messages processed)
+                # update progress every batch
                 can = [[InlineKeyboardButton('Cancel', callback_data='index_cancel')]]
                 reply = InlineKeyboardMarkup(can)
+
                 try:
                     await msg.edit_text(
                         text=(
@@ -289,13 +272,10 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
                         ),
                         reply_markup=reply
                     )
-                except MessageNotModified:
-                    pass
-                except Exception:
-                    # ignore other edit errors (flood, etc.)
+                except:
                     pass
 
-            # finished indexing
+            # finish message
             await msg.edit(
                 f'**__Sᴜᴄᴄᴇssғᴜʟʟʏ Sᴀᴠᴇᴅ__ ✅ : <code>{total_files}</code> __To DataBase!\n'
                 f'__Dᴜᴘʟɪᴄᴀᴛᴇ Fɪʟᴇs Sᴋɪᴘᴘᴇᴅ :__ <code>{duplicate}</code>\n'
@@ -308,9 +288,7 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
             logger.exception(e)
             try:
                 await msg.edit(f'**__Error: {e}__**')
-            except Exception:
+            except:
                 pass
         finally:
-            # reset CANCEL so future runs start fresh
             temp.CANCEL = False
-
